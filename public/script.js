@@ -503,7 +503,8 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const fetchUrl = window.location.protocol === 'file:' ? 'http://localhost:3000/api/create-case' : '/api/create-case';
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const fetchUrl = isLocalhost ? '/api/create-case' : 'http://localhost:3000/api/create-case';
       const response = await fetch(fetchUrl, {
         method: "POST",
         headers: {
