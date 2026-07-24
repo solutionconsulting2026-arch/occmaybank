@@ -503,8 +503,15 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const fetchUrl = isLocalhost ? '/api/create-case' : 'http://localhost:3000/api/create-case';
+      const savedEndpoint = localStorage.getItem("crm_api_endpoint");
+      let apiBase = "";
+      if (savedEndpoint) {
+        apiBase = savedEndpoint.replace(/\/$/, "");
+      } else {
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        apiBase = isLocalhost ? "" : "http://localhost:3000";
+      }
+      const fetchUrl = `${apiBase}/api/create-case`;
       const response = await fetch(fetchUrl, {
         method: "POST",
         headers: {
@@ -593,5 +600,45 @@ document.addEventListener("DOMContentLoaded", () => {
     thankYouWrapper.classList.add("hidden");
     formWrapper.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });
+    // --- Settings Panel Logic ---
+    const btnToggleSettings = document.getElementById("btn-toggle-settings");
+    const btnCloseSettings = document.getElementById("btn-close-settings");
+    const settingsPanel = document.getElementById("settings-panel");
+    const settingsApiUrlInput = document.getElementById("settings-api-url");
+    const btnSaveSettings = document.getElementById("btn-save-settings");
+    const btnResetSettings = document.getElementById("btn-reset-settings");
+
+    // Load saved endpoint URL
+    const currentEndpoint = localStorage.getItem("crm_api_endpoint") || "http://localhost:3000";
+    settingsApiUrlInput.value = currentEndpoint;
+
+    // Toggle display
+    btnToggleSettings.addEventListener("click", () => {
+      settingsPanel.classList.toggle("hidden");
+    });
+
+    btnCloseSettings.addEventListener("click", () => {
+      settingsPanel.classList.add("hidden");
+    });
+
+    // Save settings
+    btnSaveSettings.addEventListener("click", () => {
+      const url = settingsApiUrlInput.value.trim();
+      if (url) {
+        localStorage.setItem("crm_api_endpoint", url);
+        alert("API endpoint saved: " + url);
+        settingsPanel.classList.add("hidden");
+      } else {
+        alert("Please enter a valid URL.");
+      }
+    });
+
+    // Reset settings
+    btnResetSettings.addEventListener("click", () => {
+      localStorage.removeItem("crm_api_endpoint");
+      settingsApiUrlInput.value = "http://localhost:3000";
+      alert("Connection settings reset to default.");
+      settingsPanel.classList.add("hidden");
+    });
   });
 });

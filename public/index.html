@@ -23,12 +23,20 @@
         </svg>
         <span class="logo-text">NOVA<span class="logo-highlight">BANK</span></span>
       </div>
-      <div class="security-seal">
-        <svg class="seal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
-        <span>Secure 256-bit SSL</span>
+      <div class="header-right">
+        <div class="security-seal">
+          <svg class="seal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>Secure 256-bit SSL</span>
+        </div>
+        <button type="button" class="settings-toggle-btn" id="btn-toggle-settings" title="CRM Proxy Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </button>
       </div>
     </div>
   </header>
@@ -36,6 +44,27 @@
   <!-- Main Container -->
   <main class="portal-container">
     <h1 class="page-title">Contact Us</h1>
+
+    <!-- Settings Panel (Initially Hidden) -->
+    <div class="settings-panel hidden" id="settings-panel">
+      <div class="settings-panel-header">
+        <h4>CRM Proxy Connection Settings</h4>
+        <button type="button" class="settings-close-btn" id="btn-close-settings">×</button>
+      </div>
+      <div class="settings-panel-body">
+        <p class="settings-warning-info">
+          <strong>Mixed Content Notice</strong>: Since GitHub Pages is loaded over HTTPS, modern browsers strictly restrict insecure HTTP requests to a local proxy (e.g. <code>http://localhost:3000</code>). For local testing, please run the portal via <strong>http://localhost:3000</strong> or open the <strong>index.html</strong> file directly. To use this static hosted page, specify a secure HTTPS CRM proxy endpoint below.
+        </p>
+        <div class="settings-form-group">
+          <label for="settings-api-url" class="field-label">CRM Proxy API Base URL</label>
+          <div class="settings-input-row">
+            <input type="text" id="settings-api-url" placeholder="e.g. http://localhost:3000 or https://your-server.com">
+            <button type="button" class="btn btn-primary-blue" id="btn-save-settings">Save</button>
+            <button type="button" class="btn btn-secondary-gray" id="btn-reset-settings">Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Form Section -->
     <div class="form-container-box" id="form-wrapper">
