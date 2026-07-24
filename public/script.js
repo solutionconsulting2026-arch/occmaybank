@@ -503,47 +503,111 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const savedEndpoint = localStorage.getItem("crm_api_endpoint");
-      let apiBase = "";
-      if (savedEndpoint) {
-        apiBase = savedEndpoint.replace(/\/$/, "");
-      } else {
-        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        apiBase = isLocalhost ? "" : "http://localhost:3000";
-      }
-      const fetchUrl = `${apiBase}/api/create-case`;
-      const response = await fetch(fetchUrl, {
-        method: "POST",
+      // 1. Authenticate directly with CRM auth API
+      const authUrl = 'https://presales1.businessbywire.com/restapigold8demo/oauth2/token';
+      const authPayload = {
+        userName: 'james@crmnext.com',
+        password: 'Chief@admin2025'
+      };
+
+      const authResponse = await fetch(authUrl, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json"
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(authPayload)
       });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        // Render success page details
-        successCaseId.textContent = data.caseId;
-        tdCustomerName.textContent = fullName;
-        tdProduct.textContent = payload.product;
-        tdSubject.textContent = subjectLine;
-        tdEmail.textContent = payload.emailId;
-
-        // Close verification modal now
-        closeModal();
-
-        // Transition from Form page to Thank You page
-        formWrapper.classList.add("hidden");
-        thankYouWrapper.classList.remove("hidden");
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      } else {
-        alert("Error creating case in CRM system: " + (data.error || "Unknown server response"));
-        console.error("API response details:", data);
+      if (!authResponse.ok) {
+        const errorText = await authResponse.text();
+        throw new Error('Authentication failed: ' + errorText);
       }
+
+      const authData = await authResponse.json();
+      const token = authData.access_token || authData.token || (authData.result && authData.result.token) || authData.accessToken;
+
+      if (!token) {
+        throw new Error('No access token returned from CRM authentication');
+      }
+
+      // 2. Submit case directly to CRM saveObject API
+      const saveObjectUrl = 'https://presales1.businessbywire.com/restapigold8demo/crmWebApi/saveObject';
+      const crmPayload = [
+        {
+          "ItemId": "0",
+          "ItemType": "Case",
+          "ProcessMode": "Create",
+          "OutputFieldList": [
+            "CaseId",
+            "ItemId"
+          ],
+          "ObjectData": {
+            "LayoutID": 103120,
+            "ProcessID": 10001198,
+            "Category": payload.category,
+            "SubCategory": payload.subCategory,
+            "SubCategory1": payload.subSubCategory,
+            "StatusCode": "New Request",
+            "Subject": payload.subject,
+            "Product": payload.product,
+            "Details": payload.details,
+            "Cas_ex2_20": payload.customerName,
+            "Cas_ex6_120": payload.accountNumber,
+            "Cas_ex1_9": payload.mobileNumber,
+            "Cas_ex1_3": payload.emailId,
+            "XMLField_5729": "Website"
+          }
+        }
+      ];
+
+      const saveResponse = await fetch(saveObjectUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(crmPayload)
+      });
+
+      if (!saveResponse.ok) {
+        const errorText = await saveResponse.text();
+        throw new Error('CRM Case creation request failed: ' + errorText);
+      }
+
+      const saveResult = await saveResponse.json();
+      
+      // Extract Case ID from response
+      let caseId = null;
+      if (Array.isArray(saveResult) && saveResult.length > 0) {
+        const firstResult = saveResult[0];
+        if (firstResult.Errors && firstResult.Errors.length > 0) {
+          throw new Error('CRM returned errors: ' + JSON.stringify(firstResult.Errors));
+        }
+        caseId = firstResult.ResponseData?.CaseId || firstResult.ResponseData?.ItemId || firstResult.ObjectKey;
+      }
+
+      if (!caseId) {
+        caseId = saveResult[0]?.ResponseData?.CaseId || saveResult[0]?.ItemId || saveResult[0]?.ObjectKey || 'N/A';
+      }
+
+      // Render success page details
+      successCaseId.textContent = caseId;
+      tdCustomerName.textContent = fullName;
+      tdProduct.textContent = payload.product;
+      tdSubject.textContent = subjectLine;
+      tdEmail.textContent = payload.emailId;
+
+      // Close verification modal now
+      closeModal();
+
+      // Transition from Form page to Thank You page
+      formWrapper.classList.add("hidden");
+      thankYouWrapper.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
     } catch (err) {
-      alert("Failed to submit request to CRM Proxy Server. Check your connectivity.");
-      console.error("Network error during case submission:", err);
+      alert("Error submitting request to CRM API: " + err.message);
+      console.error("CRM submission error details:", err);
     } finally {
       // Restore submit button state
       btnVerifyOtp.disabled = false;
@@ -600,45 +664,5 @@ document.addEventListener("DOMContentLoaded", () => {
     thankYouWrapper.classList.add("hidden");
     formWrapper.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });
-    // --- Settings Panel Logic ---
-    const btnToggleSettings = document.getElementById("btn-toggle-settings");
-    const btnCloseSettings = document.getElementById("btn-close-settings");
-    const settingsPanel = document.getElementById("settings-panel");
-    const settingsApiUrlInput = document.getElementById("settings-api-url");
-    const btnSaveSettings = document.getElementById("btn-save-settings");
-    const btnResetSettings = document.getElementById("btn-reset-settings");
-
-    // Load saved endpoint URL
-    const currentEndpoint = localStorage.getItem("crm_api_endpoint") || "http://localhost:3000";
-    settingsApiUrlInput.value = currentEndpoint;
-
-    // Toggle display
-    btnToggleSettings.addEventListener("click", () => {
-      settingsPanel.classList.toggle("hidden");
-    });
-
-    btnCloseSettings.addEventListener("click", () => {
-      settingsPanel.classList.add("hidden");
-    });
-
-    // Save settings
-    btnSaveSettings.addEventListener("click", () => {
-      const url = settingsApiUrlInput.value.trim();
-      if (url) {
-        localStorage.setItem("crm_api_endpoint", url);
-        alert("API endpoint saved: " + url);
-        settingsPanel.classList.add("hidden");
-      } else {
-        alert("Please enter a valid URL.");
-      }
-    });
-
-    // Reset settings
-    btnResetSettings.addEventListener("click", () => {
-      localStorage.removeItem("crm_api_endpoint");
-      settingsApiUrlInput.value = "http://localhost:3000";
-      alert("Connection settings reset to default.");
-      settingsPanel.classList.add("hidden");
-    });
   });
 });
