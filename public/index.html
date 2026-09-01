@@ -160,14 +160,14 @@
               <!-- Account Number (Conditional) -->
               <div class="form-group" id="account-number-group">
                 <label for="accountNumber" class="field-label">Account Number <span class="required">*</span></label>
-                <input type="text" id="accountNumber" name="accountNumber" placeholder="Account Number" required pattern="\d{9,18}">
+                <input type="text" id="accountNumber" name="accountNumber" placeholder="e.g. 10 to 14-digit Account Number" required pattern="\d{9,18}">
                 <span class="error-msg" id="error-accountNumber">Please enter a valid 9 to 18-digit account number.</span>
               </div>
 
               <!-- Mailing Address -->
               <div class="form-group">
                 <label for="address" class="field-label">Mailing Address</label>
-                <input type="text" id="address" name="address" placeholder="Mailing Address (Optional)">
+                <input type="text" id="address" name="address" placeholder="e.g. No. 12, Jalan Sultan Ismail, 50250 Kuala Lumpur">
               </div>
 
               <!-- Issue Description -->
@@ -180,26 +180,26 @@
               <!-- Email ID -->
               <div class="form-group">
                 <label for="emailId" class="field-label">Email ID <span class="required">*</span></label>
-                <input type="email" id="emailId" name="emailId" placeholder="Email ID" required>
+                <input type="email" id="emailId" name="emailId" placeholder="name@example.com" required>
                 <span class="error-msg" id="error-emailId">Please enter a valid email address.</span>
               </div>
 
               <!-- Mobile No -->
               <div class="form-group">
                 <label for="mobileNumber" class="field-label">Mobile No <span class="required">*</span></label>
-                <input type="tel" id="mobileNumber" name="mobileNumber" placeholder="10-digit Mobile No" required pattern="[6-9]\d{9}">
-                <span class="error-msg" id="error-mobileNumber">Enter a valid 10-digit mobile number starting with 6-9.</span>
+                <input type="tel" id="mobileNumber" name="mobileNumber" placeholder="e.g. 012-345 6789 or 12 345 6789" required>
+                <span class="error-msg" id="error-mobileNumber">Please enter a valid Malaysian mobile number (e.g. 012-345 6789 or 011-1234 5678).</span>
               </div>
 
               <!-- Country Code & Alternate No -->
               <div class="form-group phone-row">
                 <div class="country-code-col">
                   <label for="countryCode" class="field-label">Country Code</label>
-                  <input type="text" id="countryCode" name="countryCode" value="91" placeholder="91">
+                  <input type="text" id="countryCode" name="countryCode" value="60" placeholder="60">
                 </div>
                 <div class="alternate-no-col">
                   <label for="alternateNo" class="field-label">Alternate No</label>
-                  <input type="tel" id="alternateNo" name="alternateNo" placeholder="Alternate No">
+                  <input type="tel" id="alternateNo" name="alternateNo" placeholder="e.g. 03-2170 8888">
                 </div>
               </div>
 
@@ -302,7 +302,7 @@
     <!-- Footer Copyright -->
     <footer class="portal-footer">
       <div class="footer-links">
-        <span>&copy; NOVA Bank Ltd.</span>
+        <span>&copy; NOVA Bank (Malaysia) Berhad</span>
         <a href="#" onclick="return false;">Privacy Policy</a>
         <a href="#" onclick="return false;">Secure Banking</a>
         <a href="#" onclick="return false;">Terms & Conditions</a>
@@ -327,7 +327,7 @@
           </svg>
         </div>
         <p class="otp-instruction">
-          A secure One-Time Password (OTP) has been simulated and sent to your registered mobile number <strong id="otp-mobile-mask">******9982</strong> and email.
+          A secure One-Time Password (OTP) has been simulated and sent to your registered mobile number <strong id="otp-mobile-mask">+60 ******5678</strong> and email.
         </p>
 
         <!-- Test Notification Alert Box -->

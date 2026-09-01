@@ -36,7 +36,7 @@ app.post('/api/create-case', async (req, res) => {
     console.log('Received case creation request for customer:', customerName);
 
     // 1. Authenticate and get Token
-    const authUrl = 'https://presales1.businessbywire.com/restapigold8demo/oauth2/token';
+    const authUrl = 'https://presales.businessbywire.com/restapigb8/oauth2/token';
     const authPayload = {
       userName: 'james@crmnext.com',
       password: 'Chief@admin2025'
@@ -77,7 +77,7 @@ app.post('/api/create-case', async (req, res) => {
     }
 
     // 2. Submit case to CRM Web API
-    const saveObjectUrl = 'https://presales1.businessbywire.com/restapigold8demo/crmWebApi/saveObject';
+    const saveObjectUrl = 'https://presales.businessbywire.com/restapigb8/crmWebApi/saveObject';
     
     // Construct ObjectData payload based on specs
     const crmPayload = [
@@ -90,8 +90,9 @@ app.post('/api/create-case', async (req, res) => {
           "ItemId"
         ],
         "ObjectData": {
-          "LayoutID": 103120,
-          "ProcessID": 10001198,
+          "LayoutID": 103132,
+          "ProcessID": 10001194,
+          "AccountID": 2577,
           "Category": category || "",
           "SubCategory": subCategory || "",
           "SubCategory1": subSubCategory || "",
@@ -103,7 +104,8 @@ app.post('/api/create-case', async (req, res) => {
           "Cas_ex6_120": accountNumber || "",
           "Cas_ex1_9": mobileNumber || "",
           "Cas_ex1_3": emailId || "",
-          "XMLField_5729": "Website"
+          "XMLField_5729": "Website",
+          "Origin": "Mobile Banking/Internet Banking"
         }
       }
     ];
@@ -138,11 +140,11 @@ app.post('/api/create-case', async (req, res) => {
     let caseId = null;
     if (Array.isArray(saveResult) && saveResult.length > 0) {
       const firstResult = saveResult[0];
-      if (firstResult.Errors && firstResult.Errors.length > 0) {
+      if (firstResult.IsSuccess === false || (firstResult.Errors && firstResult.Errors.length > 0)) {
         return res.status(400).json({
           success: false,
-          error: 'CRM returned errors while saving case',
-          details: firstResult.Errors
+          error: firstResult.Message || 'CRM returned errors while saving case',
+          details: firstResult.Errors || firstResult.Message
         });
       }
       
@@ -153,11 +155,14 @@ app.post('/api/create-case', async (req, res) => {
       if (!caseId) {
         caseId = firstResult.ObjectKey || firstResult.Objectkey || firstResult.objectKey;
       }
+      if (!caseId && firstResult.Result && firstResult.Result.CaseId) {
+        caseId = Array.isArray(firstResult.Result.CaseId) ? firstResult.Result.CaseId[0] : firstResult.Result.CaseId;
+      }
     }
 
     if (!caseId) {
       console.warn('Could not find CaseId in standard response structure, sending raw response');
-      caseId = saveResult[0]?.ResponseData?.CaseId || saveResult[0]?.ItemId || saveResult[0]?.ObjectKey || 'N/A';
+      caseId = saveResult[0]?.ResponseData?.CaseId || saveResult[0]?.ItemId || saveResult[0]?.ObjectKey || saveResult[0]?.Result?.CaseId?.[0] || 'N/A';
     }
 
     return res.status(200).json({

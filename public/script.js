@@ -338,14 +338,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!subCategorySelect.value) { showError(subCategorySelect); isValid = false; }
     if (subSubCategorySelect.required && !subSubCategorySelect.value) { showError(subSubCategorySelect); isValid = false; }
 
-    // First/Last Name
+    // First/Last Name (Supporting letters, spaces, hyphens, and dots common in Malaysian names)
+    const nameRegex = /^[a-zA-Z\s\.\'\/\-]+$/;
     const firstName = firstNameInput.value.trim();
-    if (!firstName || firstName.length < 2 || !/^[a-zA-Z]+$/.test(firstName)) {
+    if (!firstName || firstName.length < 2 || !nameRegex.test(firstName)) {
       showError(firstNameInput);
       isValid = false;
     }
     const lastName = lastNameInput.value.trim();
-    if (!lastName || lastName.length < 2 || !/^[a-zA-Z]+$/.test(lastName)) {
+    if (!lastName || lastName.length < 1 || !nameRegex.test(lastName)) {
       showError(lastNameInput);
       isValid = false;
     }
@@ -373,8 +374,9 @@ document.addEventListener("DOMContentLoaded", () => {
       isValid = false;
     }
 
-    // Mobile Number
-    if (!/^[6-9]\d{9}$/.test(mobileNumberInput.value.trim())) {
+    // Mobile Number (Malaysian mobile format: 9-10 digits starting with 1, or 10-11 digits starting with 01)
+    const cleanMobile = mobileNumberInput.value.trim().replace(/[\s\-]/g, "");
+    if (!/^(?:0)?1[0-9]{8,9}$/.test(cleanMobile)) {
       showError(mobileNumberInput);
       isValid = false;
     }
@@ -392,8 +394,9 @@ document.addEventListener("DOMContentLoaded", () => {
       demoOtpDisplay.textContent = currentMockOTP;
 
       // 2. Set mobile mask in description
-      const mob = mobileNumberInput.value.trim();
-      otpMobileMask.textContent = `+${countryCodeInput.value || '91'} ******${mob.slice(-4)}`;
+      let cleanMob = mobileNumberInput.value.trim().replace(/[\s\-]/g, "");
+      const cleanCode = (countryCodeInput.value || "60").replace(/[^0-9]/g, "") || "60";
+      otpMobileMask.textContent = `+${cleanCode} ******${cleanMob.slice(-4)}`;
 
       // 3. Clear OTP digits input boxes
       otpInputFields.forEach(field => {
@@ -488,6 +491,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const subSub = subSubCategorySelect.value;
     const subjectLine = subSub ? `${cat} - ${sub} - ${subSub}` : `${cat} - ${sub}`;
 
+    // Format Malaysian mobile number cleanly
+    let cleanMob = mobileNumberInput.value.trim().replace(/[\s\-]/g, "");
+    if (cleanMob.startsWith("0")) {
+      cleanMob = cleanMob.substring(1);
+    }
+    const cleanCode = (countryCodeInput.value || "60").replace(/[^0-9]/g, "") || "60";
+    const fullMobileNumber = cleanCode + cleanMob;
+
+    if (alternateNoInput && alternateNoInput.value.trim()) {
+      detailDescription += `\n\n[Alternate Contact: ${alternateNoInput.value.trim()}]`;
+    }
+
     const payload = {
       product: productSelect.value,
       category: cat,
@@ -496,102 +511,33 @@ document.addEventListener("DOMContentLoaded", () => {
       customerName: fullName,
       accountNumber: isCustomer ? accountNumberInput.value.trim() : "N/A (Non-customer)",
       isExistingCustomer: isCustomer,
-      mobileNumber: (countryCodeInput.value || "91") + mobileNumberInput.value.trim(),
+      mobileNumber: fullMobileNumber,
       emailId: emailIdInput.value.trim(),
       details: detailDescription,
       subject: subjectLine
     };
 
     try {
-      // 1. Authenticate directly with CRM auth API
-      const authUrl = 'https://presales1.businessbywire.com/restapigold8demo/oauth2/token';
-      const authPayload = {
-        userName: 'james@crmnext.com',
-        password: 'Chief@admin2025'
-      };
-
-      const authResponse = await fetch(authUrl, {
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const fetchUrl = isLocalhost ? '/api/create-case' : 'http://localhost:3000/api/create-case';
+      
+      const response = await fetch(fetchUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(authPayload)
+        body: JSON.stringify(payload)
       });
 
-      if (!authResponse.ok) {
-        const errorText = await authResponse.text();
-        throw new Error('Authentication failed: ' + errorText);
-      }
+      const data = await response.json().catch(() => null);
 
-      const authData = await authResponse.json();
-      const token = authData.access_token || authData.token || (authData.result && authData.result.token) || authData.accessToken;
-
-      if (!token) {
-        throw new Error('No access token returned from CRM authentication');
-      }
-
-      // 2. Submit case directly to CRM saveObject API
-      const saveObjectUrl = 'https://presales1.businessbywire.com/restapigold8demo/crmWebApi/saveObject';
-      const crmPayload = [
-        {
-          "ItemId": "0",
-          "ItemType": "Case",
-          "ProcessMode": "Create",
-          "OutputFieldList": [
-            "CaseId",
-            "ItemId"
-          ],
-          "ObjectData": {
-            "LayoutID": 103120,
-            "ProcessID": 10001198,
-            "Category": payload.category,
-            "SubCategory": payload.subCategory,
-            "SubCategory1": payload.subSubCategory,
-            "StatusCode": "New Request",
-            "Subject": payload.subject,
-            "Product": payload.product,
-            "Details": payload.details,
-            "Cas_ex2_20": payload.customerName,
-            "Cas_ex6_120": payload.accountNumber,
-            "Cas_ex1_9": payload.mobileNumber,
-            "Cas_ex1_3": payload.emailId,
-            "XMLField_5729": "Website"
-          }
-        }
-      ];
-
-      const saveResponse = await fetch(saveObjectUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(crmPayload)
-      });
-
-      if (!saveResponse.ok) {
-        const errorText = await saveResponse.text();
-        throw new Error('CRM Case creation request failed: ' + errorText);
-      }
-
-      const saveResult = await saveResponse.json();
-      
-      // Extract Case ID from response
-      let caseId = null;
-      if (Array.isArray(saveResult) && saveResult.length > 0) {
-        const firstResult = saveResult[0];
-        if (firstResult.Errors && firstResult.Errors.length > 0) {
-          throw new Error('CRM returned errors: ' + JSON.stringify(firstResult.Errors));
-        }
-        caseId = firstResult.ResponseData?.CaseId || firstResult.ResponseData?.ItemId || firstResult.ObjectKey;
-      }
-
-      if (!caseId) {
-        caseId = saveResult[0]?.ResponseData?.CaseId || saveResult[0]?.ItemId || saveResult[0]?.ObjectKey || 'N/A';
+      if (!response.ok || !data || !data.success) {
+        const errMsg = data?.error || data?.details || `Server returned HTTP status ${response.status}`;
+        throw new Error(errMsg);
       }
 
       // Render success page details
-      successCaseId.textContent = caseId;
+      successCaseId.textContent = data.caseId;
       tdCustomerName.textContent = fullName;
       tdProduct.textContent = payload.product;
       tdSubject.textContent = subjectLine;
@@ -606,7 +552,11 @@ document.addEventListener("DOMContentLoaded", () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
 
     } catch (err) {
-      alert("Error submitting request to CRM API: " + err.message);
+      if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
+        alert("Cannot reach local backend proxy server.\n\nPlease ensure the server is running by running 'npm start' or 'node server.js' in your terminal, and open http://localhost:3000 in your browser.");
+      } else {
+        alert("Error submitting request to CRM API: " + err.message);
+      }
       console.error("CRM submission error details:", err);
     } finally {
       // Restore submit button state
