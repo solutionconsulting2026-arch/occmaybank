@@ -1,8 +1,8 @@
 /* Corporate Banking Stylesheet - Maybank Malaysia Theme */
 
 :root {
-  --maybank-yellow: #ffcd00;
-  --maybank-yellow-hover: #e5b800;
+  --maybank-yellow: #ffc70a;
+  --maybank-yellow-hover: #e5b209;
   --maybank-yellow-light: #fffdf0;
   --maybank-black: #231f20;
   --maybank-dark: #1a1a1a;
@@ -10,13 +10,13 @@
   --navy-dark: #231f20;
   --navy-primary: #231f20;
   --navy-light: #383838;
-  --red-accent: #ffcd00;
-  --red-hover: #e5b800;
+  --red-accent: #ffc70a;
+  --red-hover: #e5b209;
   --error-color: #dc2626;
   --bg-body: #f8f9fa;
   --bg-white: #ffffff;
   --border-light: #d8e0e9;
-  --border-focus: #ffcd00;
+  --border-focus: #ffc70a;
   --text-dark: #231f20;
   --text-gray: #4f5e71;
   --text-light: #8e9cae;
@@ -47,7 +47,7 @@ body {
   background-color: var(--bg-white);
   border-top: 4px solid var(--maybank-yellow);
   border-bottom: 1px solid var(--border-light);
-  padding: 12px 0;
+  padding: 10px 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
@@ -63,25 +63,14 @@ body {
 .logo-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
 }
 
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
-}
-
-.logo-text {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 800;
-  font-size: 24px;
-  color: #231f20;
-  letter-spacing: -0.5px;
-}
-
-.logo-highlight {
-  color: var(--maybank-yellow);
+.maybank-header-logo {
+  height: 42px;
+  width: auto;
+  display: block;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .security-seal {
