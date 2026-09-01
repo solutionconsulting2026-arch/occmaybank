@@ -182,6 +182,6 @@ app.post('/api/create-case', async (req, res) => {
 
 // Start Server
 app.listen(PORT, () => {
-  console.log(`NOVA Bank Backend Proxy Server is running on port ${PORT}`);
+  console.log(`Maybank OCC Backend Proxy Server is running on port ${PORT}`);
   console.log(`Local Access URL: http://localhost:${PORT}`);
 });

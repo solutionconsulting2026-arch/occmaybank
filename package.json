@@ -1,7 +1,7 @@
 {
-  "name": "nova-bank-case-capture",
+  "name": "maybank-occ-case-capture",
   "version": "1.0.0",
-  "description": "NOVA Bank Case Capture system with CRM API Integration",
+  "description": "Maybank Online Case Capture system with CRM API Integration",
   "main": "server.js",
   "type": "module",
   "scripts": {

@@ -302,7 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     for (let i = 0; i < text.length; i++) {
       const char = text.charAt(i);
-      ctx.fillStyle = i % 2 === 0 ? "#1c3f60" : "#e11d48"; // Corporate colors for captcha text
+      ctx.fillStyle = i % 2 === 0 ? "#231f20" : "#b45309"; // Maybank dark & amber colors for captcha
       
       const x = 12 + i * 26;
       const y = captchaCanvas.height / 2 + (Math.random() * 8 - 4);
@@ -321,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Draw noise dots
     for (let i = 0; i < 40; i++) {
-      ctx.fillStyle = Math.random() > 0.5 ? "#1c3f60" : "#e11d48";
+      ctx.fillStyle = Math.random() > 0.5 ? "#231f20" : "#d97706";
       ctx.beginPath();
       ctx.arc(Math.random() * captchaCanvas.width, Math.random() * captchaCanvas.height, 1.5, 0, Math.PI * 2);
       ctx.fill();

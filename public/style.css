@@ -1,23 +1,30 @@
-/* Corporate Banking Stylesheet - NOVA Bank Light Theme */
+/* Corporate Banking Stylesheet - Maybank Malaysia Theme */
 
 :root {
-  --navy-dark: #0f2942;
-  --navy-primary: #1c3f60;
-  --navy-light: #2c5982;
-  --red-accent: #e11d48;
-  --red-hover: #be123c;
-  --bg-body: #f4f6f9;
+  --maybank-yellow: #ffcd00;
+  --maybank-yellow-hover: #e5b800;
+  --maybank-yellow-light: #fffdf0;
+  --maybank-black: #231f20;
+  --maybank-dark: #1a1a1a;
+  
+  --navy-dark: #231f20;
+  --navy-primary: #231f20;
+  --navy-light: #383838;
+  --red-accent: #ffcd00;
+  --red-hover: #e5b800;
+  --error-color: #dc2626;
+  --bg-body: #f8f9fa;
   --bg-white: #ffffff;
   --border-light: #d8e0e9;
-  --border-focus: #1c3f60;
-  --text-dark: #1e293b;
+  --border-focus: #ffcd00;
+  --text-dark: #231f20;
   --text-gray: #4f5e71;
   --text-light: #8e9cae;
   --success-color: #10b981;
   
   --transition-fast: 0.2s ease-in-out;
   --transition-normal: 0.3s ease-in-out;
-  --border-radius: 4px; /* Banking themes usually prefer conservative/sharp borders */
+  --border-radius: 6px;
 }
 
 /* Reset */
@@ -38,9 +45,10 @@ body {
 /* Header Styling */
 .top-header {
   background-color: var(--bg-white);
+  border-top: 4px solid var(--maybank-yellow);
   border-bottom: 1px solid var(--border-light);
   padding: 12px 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .header-container {
@@ -55,24 +63,25 @@ body {
 .logo-wrapper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .logo-icon {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
 }
 
 .logo-text {
   font-family: 'Outfit', sans-serif;
   font-weight: 800;
-  font-size: 20px;
-  color: var(--navy-dark);
-  letter-spacing: 0.5px;
+  font-size: 24px;
+  color: #231f20;
+  letter-spacing: -0.5px;
 }
 
 .logo-highlight {
-  color: var(--red-accent);
+  color: var(--maybank-yellow);
 }
 
 .security-seal {
@@ -127,10 +136,11 @@ body {
 }
 
 .section-header {
-  background: linear-gradient(to right, #005691, #1c3f60);
+  background: #231f20;
   color: var(--bg-white);
-  padding: 10px 16px;
-  font-weight: 600;
+  border-left: 5px solid var(--maybank-yellow);
+  padding: 12px 18px;
+  font-weight: 700;
   font-size: 15px;
   letter-spacing: 0.5px;
   font-family: 'Outfit', sans-serif;
@@ -144,7 +154,7 @@ body {
   display: block;
   text-align: right;
   font-size: 11px;
-  color: var(--red-accent);
+  color: var(--error-color, #dc2626);
   margin-bottom: 12px;
 }
 
@@ -515,39 +525,46 @@ select:disabled {
   justify-content: center;
 }
 
-.btn-danger {
-  background-color: var(--red-accent);
-  color: var(--bg-white);
-  box-shadow: 0 2px 4px rgba(225, 29, 72, 0.2);
+.btn-danger,
+.btn-maybank {
+  background-color: var(--maybank-yellow);
+  color: #231f20;
+  font-weight: 700;
+  border: 1px solid #e5b800;
+  box-shadow: 0 2px 4px rgba(255, 205, 0, 0.3);
 }
 
-.btn-danger:hover {
-  background-color: var(--red-hover);
+.btn-danger:hover,
+.btn-maybank:hover {
+  background-color: var(--maybank-yellow-hover);
+  color: #000000;
   transform: translateY(-1px);
 }
 
 .btn-secondary-gray {
-  background-color: #e2e8f0;
+  background-color: #f1f5f9;
   color: var(--text-dark);
+  border: 1px solid var(--border-light);
 }
 
 .btn-secondary-gray:hover {
-  background-color: #cbd5e1;
+  background-color: #e2e8f0;
 }
 
 .btn-primary-blue {
-  background-color: var(--navy-primary);
+  background-color: #231f20;
   color: var(--bg-white);
+  border: 1px solid #231f20;
 }
 
 .btn-primary-blue:hover {
-  background-color: var(--navy-light);
+  background-color: #383838;
 }
 
 /* Validation Feedback errors */
 .error-msg {
   font-size: 11px;
-  color: var(--red-accent);
+  color: var(--error-color, #dc2626);
   margin-top: 2px;
   display: none;
 }
@@ -555,7 +572,7 @@ select:disabled {
 .form-group.invalid input,
 .form-group.invalid select,
 .form-group.invalid textarea {
-  border-color: var(--red-accent);
+  border-color: var(--error-color, #dc2626);
   background-color: #fef2f2;
 }
 
@@ -748,8 +765,9 @@ select:disabled {
 }
 
 .modal-header {
-  background-color: var(--navy-primary);
+  background-color: var(--maybank-black);
   color: var(--bg-white);
+  border-left: 4px solid var(--maybank-yellow);
   padding: 12px 16px;
   display: flex;
   justify-content: space-between;
@@ -778,7 +796,7 @@ select:disabled {
 }
 
 .otp-graphic {
-  color: var(--navy-primary);
+  color: #d97706;
   margin-bottom: 12px;
 }
 
