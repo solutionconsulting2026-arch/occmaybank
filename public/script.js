@@ -518,8 +518,15 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     try {
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const fetchUrl = isLocalhost ? '/api/create-case' : 'http://localhost:3000/api/create-case';
+      const savedEndpoint = localStorage.getItem("crm_api_endpoint");
+      let apiBase = "";
+      if (savedEndpoint) {
+        apiBase = savedEndpoint.replace(/\/$/, "");
+      } else {
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        apiBase = isLocalhost ? "" : "http://localhost:3000";
+      }
+      const fetchUrl = `${apiBase}/api/create-case`;
       
       const response = await fetch(fetchUrl, {
         method: 'POST',
@@ -553,7 +560,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (err) {
       if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
-        alert("Cannot reach local backend proxy server.\n\nPlease ensure the server is running by running 'npm start' or 'node server.js' in your terminal, and open http://localhost:3000 in your browser.");
+        const isGithub = window.location.hostname.includes('github.io');
+        if (isGithub) {
+          alert("Cannot connect to backend proxy from GitHub Pages.\n\nGitHub Pages only hosts static files and cannot run the Node.js backend.\n\nTo connect live:\n1. Deploy the backend proxy to Render or Vercel (free).\n2. Click the gear icon (⚙) at the top right and paste your deployed cloud URL.");
+          const panel = document.getElementById("settings-panel");
+          if (panel) panel.classList.remove("hidden");
+        } else {
+          alert("Cannot reach local backend proxy server.\n\nPlease ensure the server is running by running 'npm start' or 'node server.js' in your terminal, and open http://localhost:3000 in your browser.");
+        }
       } else {
         alert("Error submitting request to CRM API: " + err.message);
       }
@@ -615,4 +629,43 @@ document.addEventListener("DOMContentLoaded", () => {
     formWrapper.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "smooth" });
   });
+
+  // --- Settings Panel Logic ---
+  const btnToggleSettings = document.getElementById("btn-toggle-settings");
+  const btnCloseSettings = document.getElementById("btn-close-settings");
+  const settingsPanel = document.getElementById("settings-panel");
+  const settingsApiUrlInput = document.getElementById("settings-api-url");
+  const btnSaveSettings = document.getElementById("btn-save-settings");
+  const btnResetSettings = document.getElementById("btn-reset-settings");
+
+  if (btnToggleSettings && settingsPanel) {
+    const savedEndpoint = localStorage.getItem("crm_api_endpoint") || "";
+    settingsApiUrlInput.value = savedEndpoint;
+
+    btnToggleSettings.addEventListener("click", () => {
+      settingsPanel.classList.toggle("hidden");
+    });
+
+    btnCloseSettings.addEventListener("click", () => {
+      settingsPanel.classList.add("hidden");
+    });
+
+    btnSaveSettings.addEventListener("click", () => {
+      const url = settingsApiUrlInput.value.trim();
+      if (url) {
+        localStorage.setItem("crm_api_endpoint", url);
+        alert("CRM Proxy URL saved: " + url);
+        settingsPanel.classList.add("hidden");
+      } else {
+        alert("Please enter a valid URL.");
+      }
+    });
+
+    btnResetSettings.addEventListener("click", () => {
+      localStorage.removeItem("crm_api_endpoint");
+      settingsApiUrlInput.value = "";
+      alert("Proxy URL reset to default.");
+      settingsPanel.classList.add("hidden");
+    });
+  }
 });
