@@ -78,9 +78,8 @@ export default async function handler(req, res) {
           "ItemId"
         ],
         "ObjectData": {
-          "LayoutID": 103132,
-          "ProcessID": 10001194,
-          "AccountID": 2577,
+          "LayoutID": 102989,
+          "ProcessID": 10001083,
           "Category": category || "",
           "SubCategory": subCategory || "",
           "SubCategory1": subSubCategory || "",
@@ -93,7 +92,10 @@ export default async function handler(req, res) {
           "Cas_ex1_9": mobileNumber || "",
           "Cas_ex1_3": emailId || "",
           "XMLField_5729": "Website",
-          "Origin": "Mobile Banking/Internet Banking"
+          "AssignedToID": 1494,
+          "Origin": "Mobile Banking/Internet Banking",
+          "AccountID": 2580,
+          "Cas_ex8_12": "Yes"
         }
       }
     ];
